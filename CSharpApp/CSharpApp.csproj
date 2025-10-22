@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -11,6 +12,10 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="9.0.303" />
     <PackageReference Include="FSharpx.Collections" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharpLib\FSharpLib.fsproj" />
   </ItemGroup>
 
 </Project>

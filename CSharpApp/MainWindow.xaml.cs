@@ -1,5 +1,6 @@
 ﻿using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
+using System.Linq.Expressions;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +35,17 @@ namespace CSharpApp
         {
             string input_txt = Input_Text.Text;
             double result = FSInterpreter.calculate(input_txt);
+
+            try 
+            {
+                Output_txt.Text = result.ToString();
+            }
+            catch (Exception ex) 
+            { 
+                Error_txt.Text = ex.Message;
+            }
+            
         }
+
     }
 }
