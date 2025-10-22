@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="9.0.303" />
     <PackageReference Include="FSharpx.Collections" Version="3.1.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

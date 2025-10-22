@@ -47,5 +47,10 @@ namespace CSharpApp
             
         }
 
+        private void Graph_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Graph_Window gwin = new Graph_Window();
+            gwin.Show();
+        }
     }
 }
