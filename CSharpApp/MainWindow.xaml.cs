@@ -25,7 +25,7 @@ namespace CSharpApp
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Help_Button_Click(object sender, RoutedEventArgs e)
         {
             HelpWindow hwin = new HelpWindow();
             hwin.Show();
@@ -34,10 +34,10 @@ namespace CSharpApp
         private void SendText_Button_Click(object sender, RoutedEventArgs e)
         {
             string input_txt = Input_Text.Text;
-            double result = FSInterpreter.calculate(input_txt);
 
             try 
             {
+                double result = FSInterpreter.calculate(input_txt);
                 Output_txt.Text = result.ToString();
             }
             catch (Exception ex) 

@@ -81,3 +81,13 @@ C:\Users\yhm23dyu\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FShar
 C:\Users\yhm23dyu\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.fsproj.Up2Date
 C:\Users\yhm23dyu\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.dll
 C:\Users\yhm23dyu\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.pdb
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\bin\Debug\FSharpLib.XML
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\bin\Debug\FSharpLib.dll
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\bin\Debug\FSharpLib.pdb
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\bin\Debug\FSharp.Core.dll
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\bin\Debug\FSharp.Core.xml
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.fsproj.AssemblyReference.cache
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.fsproj.CoreCompileInputs.cache
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.fsproj.Up2Date
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.dll
+C:\Users\jacob\Source\Repos\Advanced-Programming-CW\FSharpLib\obj\Debug\FSharpLib.pdb
