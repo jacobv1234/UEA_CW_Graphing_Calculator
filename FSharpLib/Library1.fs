@@ -5,18 +5,21 @@
 
 module FSInterpreter
     open System
+    open System.Collections.Generic
 
     type terminal = 
-        Add | Sub | UnarySub | Mul | Div | Mod | Exp | Dot | SF // SF stands for Standard Form
-        | Sin | Cos | Tan | Lpar | Rpar | Num of int
+        Add | Sub | UnarySub | Mul | Div | Mod | Exp | Dot | SF                 // SF stands for Standard Form
+        | Sin | Cos | Tan | Lpar | Rpar | Ass | Var of string | Num of int      // it's not rude, it's short for Assignment
 
     let str2lst s = [for c in s -> c]
     let isblank c = System.Char.IsWhiteSpace c
     let isdigit c = System.Char.IsDigit c
+    let isalpha c = System.Char.IsLetter c
     let lexError message = raise (System.Exception(sprintf "Lexer error: %s" message))
     let intVal (c:char) = (int)((int)c - (int)'0')
     let parseError message = raise (System.Exception(sprintf "Parser error: %s" message))
     let mathError message = raise (System.Exception(sprintf "Maths error: %s" message))
+    let nameError message = raise (System.Exception(sprintf "Name error: %s" message))
 
 
     // get how many of the first characters in a string are 0s
@@ -54,6 +57,12 @@ module FSInterpreter
     // check if a double ends in .0
     let doubleIsInt a = a.Equals(floor(a))
 
+    // find variable names
+    let rec scanVarName(iStr, iVal: string) =
+        match iStr with
+        | c :: tail when isalpha c -> scanVarName(tail, iVal + string c)
+        | _ -> (iStr, iVal)
+
 
 
     let lexer input = 
@@ -70,7 +79,8 @@ module FSInterpreter
             | '^'::tail -> Exp :: scan tail false
             | '('::tail -> Lpar:: scan tail false
             | ')'::tail -> Rpar:: scan tail false
-            | '.'::tail -> Dot :: scan tail true
+            | '='::tail -> Ass:: scan tail  false
+            | '.'::tail -> Dot :: scan tail true 
             | 'E'::tail -> SF  :: scan tail false // treated as not a number to prevent decimal stuff below
             | 's'::'i'::'n'::'('::tail -> Sin :: scan tail false
             | 'c'::'o'::'s'::'('::tail -> Cos :: scan tail false
@@ -89,7 +99,15 @@ module FSInterpreter
                                                     Num modified_iVal :: scan iStr true
                                           | false -> let (iStr, iVal) = scInt(tail, intVal c)
                                                      Num iVal :: scan iStr true
+            
+            // letters - variable name
+            | c :: tail when isalpha c -> let (tail, var) = scanVarName(tail, string c)
+                                          Var var :: scan tail false
+                                          
+
+
             | _ -> lexError (sprintf "Unrecognised character '%c'" input[0])
+
         scan (str2lst input) false
 
     let getInputString() : string = 
@@ -97,6 +115,7 @@ module FSInterpreter
         Console.ReadLine()
 
     // Grammar in BNF:
+    // <St>       ::= Var '=' <E> | <E>
     // <E>        ::= <T> <Eopt>
     // <Eopt>     ::= "+" <T> <Eopt> | "-" <T> <Eopt> | <empty>
     // <T>        ::= <P> <Topt>
@@ -106,10 +125,14 @@ module FSInterpreter
     // <S>        ::= <NR> <Sopt>
     // <Sopt>     ::= "E" <NR> | <empty>
     // <NR>       ::= "Num" <value> | "(" <E> ")" | "- (unary)" <NR> | <value> '.' <value> | 
-    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")"
+    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | Var
 
-    let parser tList = 
-        let rec E tList = (T >> Eopt) tList         // >> is forward function composition operator: let inline (>>) f g x = g(f x)
+    let parser tList (symbolTable: Map<string, double>) = 
+        let rec St tList =                // >> is forward function composition operator: let inline (>>) f g x = g(f x)
+            match tList with
+            | Var value :: Ass :: tail -> E tail
+            | _ -> E tList
+        and E tList = (T >> Eopt) tList
         and Eopt tList = 
             match tList with
             | Add :: tail -> (T >> Eopt) tail
@@ -155,8 +178,15 @@ module FSInterpreter
                               | Rpar :: tail -> tail
                               | _ -> parseError "Missing right bracket"
             | UnarySub :: tail -> (NR) tail
+            | Var varName :: tail -> try
+                                        let value = symbolTable.[varName]
+                                        tail
+                                     with
+                                     | :? KeyNotFoundException ->
+                                        nameError (sprintf "Unrecognised variable name: '%s'" varName)
+                                     
             | _ -> parseError "Unknown syntax error"
-        E tList
+        St tList
 
     // every time values are passed around they are followed by a vIsInt argument
     // this is a boolean. True = the value is an int, False = the value is a double
@@ -165,9 +195,16 @@ module FSInterpreter
     // for integer arithmetic mode to be active both must have it set to True
     // though most operations don't actually change except division
 
-    let parseNeval tList = 
-        let rec E tList = (T >> Eopt) tList
-        and Eopt(tList, value: double, vIsInt) = 
+    let parseNeval tList (symbolTable: Map<string, double>) = 
+        let rec St tList (symbolTable: Map<string, double>) =
+            match tList with
+            | Var varName :: Ass :: tail -> let tList, result, resIsInt = E tail // evaluate RHS
+                                            let newSymbolTable = symbolTable |> Map.add varName result
+                                            (result, newSymbolTable)
+            | _ -> let tList, result, resIsInt = E tList 
+                   (result, symbolTable)
+        and E tList = (T >> Eopt) tList
+        and Eopt (tList, value: double, vIsInt) = 
             match tList with
             | Add :: tail -> let (tLst, tval, tvIsInt) = T tail
                              Eopt (tLst, value + tval, tvIsInt && vIsInt)
@@ -233,8 +270,15 @@ module FSInterpreter
 
             | UnarySub :: tail -> let (tLst, tval, tvIsInt) = T tail
                                   Eopt (tLst, 0.0 - tval, tvIsInt)
+            | Var varName :: tail -> try
+                                        let value = symbolTable.[varName]
+                                        (tail, value, false) // variables are automatically doubles
+                                     with
+                                     | :? KeyNotFoundException ->
+                                        nameError (sprintf "Unrecognised variable name: '%s'" varName)
+
             | _ -> parseError "Unknown syntax error"
-        E tList
+        St tList symbolTable
 
     let rec printTList (lst:list<terminal>) : list<string> = 
         match lst with
@@ -244,20 +288,39 @@ module FSInterpreter
         | [] -> Console.Write("EOL\n")
                 []
 
-    let calculate(str: string) =
+    let calcLine(str: string, symbolTable: Map<string, double>) =
         let oList = lexer str
-        let tList, Out, isInt = parseNeval oList
-        Out
+        let Out, newSymbolTable = parseNeval oList symbolTable
+        (Out, newSymbolTable)
 
+    let rec processLines(lines: string list, symbolTable: Map<string, double>) =
+        match lines with
+        | head::tail -> let Out, newSymbolTable = calcLine(head, symbolTable)
+                        match tail.Length with
+                        | 0 -> Out
+                        | _ -> processLines(tail, newSymbolTable)
+        | [] -> 0
 
-    [<EntryPoint>]
-    let main argv  =
-        Console.WriteLine("Simple Interpreter")
-        let input:string = getInputString()
-        let oList = lexer input
-        let sList = printTList oList;
-        let pList = printTList (parser oList)
-        let tList, Out, isInt = parseNeval oList
-        Console.WriteLine("Result = {0}", Out)
-        0
+    let calculate(str: string) =
+        let lines = Array.toList(str.Split(';'))
+
+        // F# Map help: https://livebook.manning.com/book/get-programming-with-f-sharp/chapter-17#50
+        let symbolTable = 
+            ["pi", double 3.1415926536]
+            |> Map.ofList
+
+        processLines(lines, symbolTable)
+        
+
+    // no longer needed due to having a GUI
+    //[<EntryPoint>]
+    //let main argv  =
+    //    Console.WriteLine("Simple Interpreter")
+    //    let input:string = getInputString()
+    //    let oList = lexer input
+    //    let sList = printTList oList;
+    //    let pList = printTList (parser oList)
+    //    let tList, Out, isInt = parseNeval oList
+    //    Console.WriteLine("Result = {0}", Out)
+    //    0
 
