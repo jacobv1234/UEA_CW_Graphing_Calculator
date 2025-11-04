@@ -9,7 +9,7 @@ module FSInterpreter
 
     type terminal = 
         Add | Sub | UnarySub | Mul | Div | Mod | Exp | Dot | SF                 // SF stands for Standard Form
-        | Sin | Cos | Tan | Lpar | Rpar | Ass | Var of string | Num of int      // it's not rude, it's short for Assignment
+        | Sin | Cos | Tan | Lpar | Rpar | Ass | Var of string | Num of int | X of double    // it's not rude, it's short for Assignment
 
     let str2lst s = [for c in s -> c]
     let isblank c = System.Char.IsWhiteSpace c
@@ -63,6 +63,14 @@ module FSInterpreter
         | c :: tail when isalpha c -> scanVarName(tail, iVal + string c)
         | _ -> (iStr, iVal)
 
+    // replace all instances of Var "x" in a tList with X value
+    // used for graph data generation
+    let rec replaceX tList (value:double) =
+        match tList with
+        | [] -> []
+        | Var "x" :: tail -> X value :: replaceX tail value
+        | t :: tail -> t :: replaceX tail value
+
 
 
     let lexer input = 
@@ -115,7 +123,7 @@ module FSInterpreter
         Console.ReadLine()
 
     // Grammar in BNF:
-    // <St>       ::= Var '=' <E> | <E>
+    // <St>       ::= <var> '=' <E> | <E>
     // <E>        ::= <T> <Eopt>
     // <Eopt>     ::= "+" <T> <Eopt> | "-" <T> <Eopt> | <empty>
     // <T>        ::= <P> <Topt>
@@ -125,7 +133,7 @@ module FSInterpreter
     // <S>        ::= <NR> <Sopt>
     // <Sopt>     ::= "E" <NR> | <empty>
     // <NR>       ::= "Num" <value> | "(" <E> ")" | "- (unary)" <NR> | <value> '.' <value> | 
-    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | Var
+    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | <var> | 'x'
 
     let parser tList (symbolTable: Map<string, double>) = 
         let rec St tList =                // >> is forward function composition operator: let inline (>>) f g x = g(f x)
@@ -165,6 +173,7 @@ module FSInterpreter
                                    | Dot :: Num subvalue :: subtail -> subtail                           // float
                                    | Dot :: subtail -> parseError "Missing value after decimal point"    // incomplete float
                                    | _ -> tail                                                           // int
+            | X value :: tail -> tail // special X num used for graph data generation
             | Sin :: tail  -> match E tail with 
                               | Rpar :: tail -> tail
                               | _ -> parseError "Missing right bracket for sin"
@@ -195,14 +204,31 @@ module FSInterpreter
     // for integer arithmetic mode to be active both must have it set to True
     // though most operations don't actually change except division
 
-    let parseNeval tList (symbolTable: Map<string, double>) = 
+    let parseNeval tList (symbolTable: Map<string, double>) xstart xstop xstep = 
         let rec St tList (symbolTable: Map<string, double>) =
             match tList with
-            | Var varName :: Ass :: tail -> let tList, result, resIsInt = E tail // evaluate RHS
-                                            let newSymbolTable = symbolTable |> Map.add varName result
-                                            (result, newSymbolTable)
+            | Var varName :: Ass :: tail -> match varName with
+                                            // reserved variable name
+                                            | "x" -> nameError "The variable name 'x' is reserved for graph plots."
+
+                                            // graphing mode
+                                            | "y" -> let rec genGraph expr (xstart: double) (xstop: double) (xstep: double) =
+                                                            if xstart > xstop then
+                                                                []
+                                                            else
+                                                                let x_expr = replaceX expr xstart                           // set value of x
+                                                                let tList, result, resIsInt = E x_expr                      // evaluate RHS for value of x
+                                                                [xstart, result] :: genGraph expr (xstart+xstep) xstop xstep  // repeat for next x
+
+                                                     let graphPoints = genGraph tail xstart xstop xstep
+                                                     (graphPoints, symbolTable)
+
+                                            // standard assignment
+                                            | _ -> let tList, result, resIsInt = E tail // evaluate RHS
+                                                   let newSymbolTable = symbolTable |> Map.add varName result
+                                                   ([[result,0.0]], newSymbolTable)
             | _ -> let tList, result, resIsInt = E tList 
-                   (result, symbolTable)
+                   ([[result,0.0]], symbolTable)
         and E tList = (T >> Eopt) tList
         and Eopt (tList, value: double, vIsInt) = 
             match tList with
@@ -251,6 +277,8 @@ module FSInterpreter
                                    | Dot :: subtail -> parseError "No value after decimal point"                      // incomplete float
                                    | _ -> (tail, value, true)                                                         // int
 
+            | X value :: tail -> (tail, value, false)                                                                 // special number for graphs
+
             | Sin :: tail  -> let (tLst, tval, tvIsInt) = E tail
                               match tLst with 
                               | Rpar :: tail -> (tail, sin(tval), false)    // false as trig functions should always return a double
@@ -288,18 +316,18 @@ module FSInterpreter
         | [] -> Console.Write("EOL\n")
                 []
 
-    let calcLine(str: string, symbolTable: Map<string, double>) =
+    let calcLine(str: string, symbolTable: Map<string, double>, xstart, xstop, xstep) =
         let oList = lexer str
-        let Out, newSymbolTable = parseNeval oList symbolTable
+        let Out, newSymbolTable = parseNeval oList symbolTable xstart xstop xstep
         (Out, newSymbolTable)
 
-    let rec processLines(lines: string list, symbolTable: Map<string, double>) =
+    let rec processLines(lines: string list, symbolTable: Map<string, double>, xstart, xstop, xstep) =
         match lines with
-        | head::tail -> let Out, newSymbolTable = calcLine(head, symbolTable)
+        | head::tail -> let Out, newSymbolTable = calcLine(head, symbolTable, xstart, xstop, xstep)
                         match tail.Length with
                         | 0 -> Out
-                        | _ -> processLines(tail, newSymbolTable)
-        | [] -> 0
+                        | _ -> processLines(tail, newSymbolTable, xstart, xstop, xstep)
+        | [] -> [[0.0,0.0]] // empty code, default value
 
     let calculate(str: string) =
         let lines = Array.toList(str.Split(';'))
@@ -309,7 +337,19 @@ module FSInterpreter
             ["pi", double 3.1415926536]
             |> Map.ofList
 
-        processLines(lines, symbolTable)
+        let result = processLines(lines, symbolTable, 0.0,10.0,0.01)
+        let group = result[0]
+        let answer, answer2 = group[0]
+        answer
+
+    let plot(str: string, start: double, stop: double, step: double) =
+        let lines = Array.toList(str.Split(';'))
+
+        let symbolTable = 
+            ["pi", double 3.1415926536]
+            |> Map.ofList
+
+        processLines(lines, symbolTable, start,stop,step)
         
 
     // no longer needed due to having a GUI
