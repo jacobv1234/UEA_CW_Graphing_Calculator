@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpApp"
+        xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -13,6 +14,6 @@
         <TextBox x:Name="Output_txt" HorizontalAlignment="Left" Margin="461,30,0,0" TextWrapping="Wrap" Text="Equation Output Here" VerticalAlignment="Top" Width="303" Height="40" IsReadOnly="True"/>
         <TextBox x:Name="Error_txt" HorizontalAlignment="Left" Margin="461,110,0,0" TextWrapping="Wrap" Text="Error Output Here" VerticalAlignment="Top" Width="303" Height="50" IsReadOnly="True"/>
         <Button x:Name="Plot_BTN" Content="Plot" HorizontalAlignment="Left" Margin="96,217,0,0" VerticalAlignment="Top" Click="Graph_Button_Click" Width="40"/>
-
+        <oxy:PlotView x:Name="PlotView" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,261,0,0" Width="740" Height="150" />
     </Grid>
 </Window>
