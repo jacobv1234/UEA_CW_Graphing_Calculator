@@ -52,25 +52,32 @@ namespace CSharpApp
         
         private void Graph_Button_Click(object sender, RoutedEventArgs e)
         {
-            string input_txt = Input_Text.Text;
+            string line_equ = Input_Text.Text;
 
+            Plot_Popup pwin = new Plot_Popup();
+            pwin.ShowDialog();
+
+
+            if (pwin.Start.Text == "" || pwin.Stop.Text == "" || pwin.Step.Text == "")
+            {
+                Error_txt.Text = "Please fill in all fields for plotting.";
+                return;
+            }
             try
             {
-                string[] input_parts = input_txt.Split(';');
+                double start = double.Parse(pwin.Start.Text);
+                double stop = double.Parse(pwin.Stop.Text);
+                double step = double.Parse(pwin.Step.Text);
 
-                string equation = input_parts[0];
-                double.TryParse(input_parts[1], out double start);
-                double.TryParse(input_parts[2], out double stop);
-                double.TryParse(input_parts[3], out double step);
-
-                var plot_results = FSInterpreter.plot(equation, start, stop, step);
+                
+                var plot_results = FSInterpreter.plot(line_equ, start, stop, step);
 
                 var points = plot_results.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
 
-                var model = new PlotModel { Title = equation };
+                var model = new PlotModel { Title = line_equ };
                 var line_series = new LineSeries
                 {
-                    Title = equation,
+                    Title = line_equ,
                     StrokeThickness = 2,
                     MarkerType = MarkerType.Circle,
                     MarkerSize = 2,
@@ -85,6 +92,9 @@ namespace CSharpApp
             {
                 Error_txt.Text = ex.Message;
             }
+            
+
+
         }
     }
 }
