@@ -343,6 +343,10 @@ module FSInterpreter
         answer
 
     let plot(str: string, start: double, stop: double, step: double) =
+        if start >= stop then
+            mathError "Ending value should be greater than the starting value."
+        if step <= 0 then
+            mathError "Step should be greater than 0."
         let lines = Array.toList(str.Split(';'))
 
         let symbolTable = 
