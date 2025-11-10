@@ -1,0 +1,34 @@
+<mxfile host="Electron" modified="2025-11-10T11:56:06.550Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.1 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="z3ttKyuf4llp4XzkHm2l" version="24.5.1" type="device">
+  <diagram name="Page-1" id="pGGy61mbersxkcawPJ-J">
+    <mxGraphModel dx="1050" dy="621" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-2" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="120" y="80" width="610" height="430" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-3" value="&lt;font style=&quot;font-size: 19px;&quot;&gt;Text Entry&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=19;" vertex="1" parent="1">
+          <mxGeometry x="140" y="100" width="310" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-5" value="" style="image;html=1;image=img/lib/clip_art/finance/Graph_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="470" y="100" width="250" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-6" value="Output" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="390" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-7" value="&lt;font color=&quot;#ff6363&quot;&gt;Error&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="440" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-8" value="Compute" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="359" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-9" value="Plot" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="359" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="EJwJxNp1aDm7eHNb6k4s-10" value="" style="shape=mxgraph.signs.travel.information_1;html=1;pointerEvents=1;fillColor=#00CCCC;strokeColor=none;verticalLabelPosition=bottom;verticalAlign=top;align=center;sketch=0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="460" width="40" height="39" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
