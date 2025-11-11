@@ -67,9 +67,10 @@ module FSInterpreter
     // used for graph data generation
     let rec replaceX tList (value:double) =
         match tList with
-        | [] -> []
+        | [] -> tList
         | Var "x" :: tail -> X value :: replaceX tail value
         | t :: tail -> t :: replaceX tail value
+
 
 
 
@@ -110,7 +111,7 @@ module FSInterpreter
             
             // letters - variable name
             | c :: tail when isalpha c -> let (tail, var) = scanVarName(tail, string c)
-                                          Var var :: scan tail false
+                                          Var var :: scan tail true
                                           
 
 
