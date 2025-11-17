@@ -22,11 +22,14 @@ namespace CSharpApp
         public Plot_Popup()
         {
             InitializeComponent();
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        
     }
 }

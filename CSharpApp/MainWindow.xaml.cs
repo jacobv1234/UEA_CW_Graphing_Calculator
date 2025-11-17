@@ -68,9 +68,13 @@ namespace CSharpApp
                 double start = double.Parse(pwin.Start.Text);
                 double stop = double.Parse(pwin.Stop.Text);
                 double step = double.Parse(pwin.Step.Text);
+                bool Show_Derivative = (bool)pwin.Show_Derivative.IsChecked;
 
+
+
+                var plot_results = FSInterpreter.plot(line_equ, start, stop, step, Show_Derivative);
                 
-                var plot_results = FSInterpreter.plot(line_equ, start, stop, step);
+                
 
                 var points = plot_results.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
 
