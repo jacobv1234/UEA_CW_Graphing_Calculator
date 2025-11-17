@@ -9,7 +9,8 @@ module FSInterpreter
 
     type terminal = 
         Add | Sub | UnarySub | Mul | Div | Mod | Exp | Dot | SF                 // SF stands for Standard Form
-        | Sin | Cos | Tan | Lpar | Rpar | Ass | Var of string | Num of int | X of double    // it's not rude, it's short for Assignment
+        | Sin | Cos | Tan | Log | Ln
+        | Lpar | Rpar | Ass | Var of string | Num of int | X of double    // it's not rude, it's short for Assignment
 
     let str2lst s = [for c in s -> c]
     let isblank c = System.Char.IsWhiteSpace c
@@ -94,6 +95,8 @@ module FSInterpreter
             | 's'::'i'::'n'::'('::tail -> Sin :: scan tail false
             | 'c'::'o'::'s'::'('::tail -> Cos :: scan tail false
             | 't'::'a'::'n'::'('::tail -> Tan :: scan tail false
+            | 'l'::'o'::'g'::'('::tail -> Log :: scan tail false
+            | 'l'::'n'::     '('::tail -> Ln  :: scan tail false
             | c :: tail when isblank c -> scan tail last_was_digit
 
             // it seems a bit odd but in order to store leading 0s in decimal numbers they are moved to the end of the number
@@ -134,7 +137,7 @@ module FSInterpreter
     // <S>        ::= <NR> <Sopt>
     // <Sopt>     ::= "E" <NR> | <empty>
     // <NR>       ::= "Num" <value> | "(" <E> ")" | "- (unary)" <NR> | <value> '.' <value> | 
-    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | <var> | 'x'
+    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | "log(" <E> ")" | <var> | 'x'
 
     let parser tList (symbolTable: Map<string, double>) = 
         let rec St tList =                // >> is forward function composition operator: let inline (>>) f g x = g(f x)
@@ -184,6 +187,12 @@ module FSInterpreter
             | Tan :: tail  -> match E tail with 
                               | Rpar :: tail -> tail
                               | _ -> parseError "Missing right bracket for tan"
+            | Log :: tail  -> match E tail with 
+                              | Rpar :: tail -> tail
+                              | _ -> parseError "Missing right bracket for log"
+            | Ln :: tail  -> match E tail with 
+                              | Rpar :: tail -> tail
+                              | _ -> parseError "Missing right bracket for ln"
             | Lpar :: tail -> match E tail with 
                               | Rpar :: tail -> tail
                               | _ -> parseError "Missing right bracket"
@@ -205,7 +214,7 @@ module FSInterpreter
     // for integer arithmetic mode to be active both must have it set to True
     // though most operations don't actually change except division
 
-    let parseNeval tList (symbolTable: Map<string, double>) (typeTable: Map<string, bool>) xstart xstop xstep = 
+    let parseNeval tList (symbolTable: Map<string, double>) (typeTable: Map<string, bool>) xstart xstop xstep derivMode = 
         let rec St tList (symbolTable: Map<string, double>) =
             match tList with
             | Var varName :: Ass :: tail -> match varName with
@@ -213,15 +222,24 @@ module FSInterpreter
                                             | "x" -> nameError "The variable name 'x' is reserved for graph plots."
 
                                             // graphing mode
-                                            | "y" -> let rec genGraph expr (xstart: double) (xstop: double) (xstep: double) =
+                                            | "y" -> let rec genGraph expr (xstart: double) =
                                                             if xstart > xstop then
                                                                 []
                                                             else
                                                                 let x_expr = replaceX expr xstart                             // set value of x
                                                                 let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
-                                                                [xstart, result] :: genGraph expr (xstart+xstep) xstop xstep  // repeat for next x
 
-                                                     let graphPoints = genGraph tail xstart xstop xstep
+                                                                if derivMode then                                     // find derivative by
+                                                                    let dx = 0.000001
+                                                                    let x_expr = replaceX expr (xstart + dx)                  // evaluate RHS for x + dx
+                                                                    let tList, dx_result, dxIsInt = E x_expr
+                                                                    let dy = dx_result - result                               // find dy
+                                                                    [xstart, dy/dx] :: genGraph expr (xstart+xstep)           // repeat for next x
+
+                                                                else
+                                                                    [xstart, result] :: genGraph expr (xstart+xstep)          // repeat for next x
+
+                                                     let graphPoints = genGraph tail xstart
                                                      (graphPoints, symbolTable, typeTable)
 
                                             // standard assignment
@@ -293,6 +311,14 @@ module FSInterpreter
                               match tLst with 
                               | Rpar :: tail -> (tail, tan(tval), false)
                               | _ -> parseError "Missing right bracket for tan"
+            | Log :: tail  -> let (tLst, tval, tvIsInt) = E tail
+                              match tLst with 
+                              | Rpar :: tail -> (tail, log10(tval), false)
+                              | _ -> parseError "Missing right bracket for log"
+            | Ln  :: tail  -> let (tLst, tval, tvIsInt) = E tail
+                              match tLst with 
+                              | Rpar :: tail -> (tail, log(tval), false)
+                              | _ -> parseError "Missing right bracket for natural log"
             | Lpar :: tail -> let (tLst, tval, tvIsInt) = E tail
                               match tLst with 
                               | Rpar :: tail -> (tail, tval, tvIsInt)
@@ -319,36 +345,45 @@ module FSInterpreter
         | [] -> Console.Write("EOL\n")
                 []
 
-    let calcLine(str: string, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep) =
+    let calcLine(str: string, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep, derivMode) =
         let oList = lexer str
-        let Out, newSymbolTable, newTypeTable = parseNeval oList symbolTable typeTable xstart xstop xstep
+        let Out, newSymbolTable, newTypeTable = parseNeval oList symbolTable typeTable xstart xstop xstep derivMode
         (Out, newSymbolTable, newTypeTable)
 
-    let rec processLines(lines: string list, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep) =
+    let rec processLines(lines: string list, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep, derivMode) =
         match lines with
-        | head::tail -> let Out, newSymbolTable, newTypeTable = calcLine(head, symbolTable, typeTable, xstart, xstop, xstep)
+        | head::tail -> let Out, newSymbolTable, newTypeTable = calcLine(head, symbolTable, typeTable, xstart, xstop, xstep, derivMode)
                         match tail.Length with
                         | 0 -> Out
-                        | _ -> processLines(tail, newSymbolTable, newTypeTable, xstart, xstop, xstep)
+                        | _ -> processLines(tail, newSymbolTable, newTypeTable, xstart, xstop, xstep, derivMode)
         | [] -> [[0.0,0.0]] // empty code, default value
 
+
+    // Evaluate an input string
     let calculate(str: string) =
         let lines = Array.toList(str.Split(';'))
 
         // F# Map help: https://livebook.manning.com/book/get-programming-with-f-sharp/chapter-17#50
         let symbolTable = 
-            ["pi", double 3.1415926536]
+            ["pi", double 3.141592653589793] // this is the most accurate value of pi that can fit in a double
             |> Map.ofList
         let typeTable =
             ["pi", false]
             |> Map.ofList
 
-        let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01)
+        let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01, false) // plotting arguments aren't used, just give default values
         let group = result[0]
         let answer, answer2 = group[0]
         answer
 
-    let plot(str: string, start: double, stop: double, step: double) =
+    // Plot the graph for an input string
+    // Arguments:
+    // str: input code
+    // start: initial x value
+    // stop: ending x value
+    // step: x value precision
+    // derivMode: if True calculates derivative graph of str instead of just plotting str
+    let plot(str: string, start: double, stop: double, step: double, derivMode: bool) =
         if start >= stop then
             mathError "Ending value should be greater than the starting value."
         if step <= 0 then
@@ -356,13 +391,13 @@ module FSInterpreter
         let lines = Array.toList(str.Split(';'))
 
         let symbolTable = 
-            ["pi", double 3.1415926536]
+            ["pi", double 3.141592653589793]
             |> Map.ofList
         let typeTable =
             ["pi", false]
             |> Map.ofList
 
-        processLines(lines, symbolTable, typeTable, start,stop,step)
+        processLines(lines, symbolTable, typeTable, start,stop,step, derivMode)
         
 
     // no longer needed due to having a GUI
