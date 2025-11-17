@@ -205,7 +205,7 @@ module FSInterpreter
     // for integer arithmetic mode to be active both must have it set to True
     // though most operations don't actually change except division
 
-    let parseNeval tList (symbolTable: Map<string, double>) xstart xstop xstep = 
+    let parseNeval tList (symbolTable: Map<string, double>) (typeTable: Map<string, bool>) xstart xstop xstep = 
         let rec St tList (symbolTable: Map<string, double>) =
             match tList with
             | Var varName :: Ass :: tail -> match varName with
@@ -217,19 +217,20 @@ module FSInterpreter
                                                             if xstart > xstop then
                                                                 []
                                                             else
-                                                                let x_expr = replaceX expr xstart                           // set value of x
-                                                                let tList, result, resIsInt = E x_expr                      // evaluate RHS for value of x
+                                                                let x_expr = replaceX expr xstart                             // set value of x
+                                                                let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
                                                                 [xstart, result] :: genGraph expr (xstart+xstep) xstop xstep  // repeat for next x
 
                                                      let graphPoints = genGraph tail xstart xstop xstep
-                                                     (graphPoints, symbolTable)
+                                                     (graphPoints, symbolTable, typeTable)
 
                                             // standard assignment
                                             | _ -> let tList, result, resIsInt = E tail // evaluate RHS
                                                    let newSymbolTable = symbolTable |> Map.add varName result
-                                                   ([[result,0.0]], newSymbolTable)
+                                                   let newTypeTable = typeTable |> Map.add varName resIsInt
+                                                   ([[result,0.0]], newSymbolTable, newTypeTable)
             | _ -> let tList, result, resIsInt = E tList 
-                   ([[result,0.0]], symbolTable)
+                   ([[result,0.0]], symbolTable, typeTable)
         and E tList = (T >> Eopt) tList
         and Eopt (tList, value: double, vIsInt) = 
             match tList with
@@ -301,7 +302,8 @@ module FSInterpreter
                                   Eopt (tLst, 0.0 - tval, tvIsInt)
             | Var varName :: tail -> try
                                         let value = symbolTable.[varName]
-                                        (tail, value, false) // variables are automatically doubles
+                                        let isInt = typeTable.[varName]
+                                        (tail, value, isInt)
                                      with
                                      | :? KeyNotFoundException ->
                                         nameError (sprintf "Unrecognised variable name: '%s'" varName)
@@ -317,17 +319,17 @@ module FSInterpreter
         | [] -> Console.Write("EOL\n")
                 []
 
-    let calcLine(str: string, symbolTable: Map<string, double>, xstart, xstop, xstep) =
+    let calcLine(str: string, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep) =
         let oList = lexer str
-        let Out, newSymbolTable = parseNeval oList symbolTable xstart xstop xstep
-        (Out, newSymbolTable)
+        let Out, newSymbolTable, newTypeTable = parseNeval oList symbolTable typeTable xstart xstop xstep
+        (Out, newSymbolTable, newTypeTable)
 
-    let rec processLines(lines: string list, symbolTable: Map<string, double>, xstart, xstop, xstep) =
+    let rec processLines(lines: string list, symbolTable: Map<string, double>, typeTable: Map<string, bool>, xstart, xstop, xstep) =
         match lines with
-        | head::tail -> let Out, newSymbolTable = calcLine(head, symbolTable, xstart, xstop, xstep)
+        | head::tail -> let Out, newSymbolTable, newTypeTable = calcLine(head, symbolTable, typeTable, xstart, xstop, xstep)
                         match tail.Length with
                         | 0 -> Out
-                        | _ -> processLines(tail, newSymbolTable, xstart, xstop, xstep)
+                        | _ -> processLines(tail, newSymbolTable, newTypeTable, xstart, xstop, xstep)
         | [] -> [[0.0,0.0]] // empty code, default value
 
     let calculate(str: string) =
@@ -337,8 +339,11 @@ module FSInterpreter
         let symbolTable = 
             ["pi", double 3.1415926536]
             |> Map.ofList
+        let typeTable =
+            ["pi", false]
+            |> Map.ofList
 
-        let result = processLines(lines, symbolTable, 0.0,10.0,0.01)
+        let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01)
         let group = result[0]
         let answer, answer2 = group[0]
         answer
@@ -353,8 +358,11 @@ module FSInterpreter
         let symbolTable = 
             ["pi", double 3.1415926536]
             |> Map.ofList
+        let typeTable =
+            ["pi", false]
+            |> Map.ofList
 
-        processLines(lines, symbolTable, start,stop,step)
+        processLines(lines, symbolTable, typeTable, start,stop,step)
         
 
     // no longer needed due to having a GUI
