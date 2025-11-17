@@ -14,7 +14,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="44,125,0,0" TextWrapping="Wrap" Text="Enter the ending value" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="40,204,0,0" TextWrapping="Wrap" Text="Enter the precision value" VerticalAlignment="Top" RenderTransformOrigin="0.499,0.567"/>
         <Button Content="Build Graph" HorizontalAlignment="Center" Margin="0,279,0,0" VerticalAlignment="Top" Click="Button_Click" RenderTransformOrigin="0.503,1.353"/>
-        <CheckBox Name="Show_Derivative" Content="Show Derivative" HorizontalAlignment="Left" Margin="162,241,0,0" VerticalAlignment="Top" Checked="Show_Derivative_Checked" Unchecked="Show_Derivative_Unchecked"/>
+        <CheckBox Name="Show_Derivative" Content="Show Derivative" HorizontalAlignment="Left" Margin="162,241,0,0" VerticalAlignment="Top"/>
 
 
     </Grid>
