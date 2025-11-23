@@ -214,7 +214,12 @@ module FSInterpreter
     // for integer arithmetic mode to be active both must have it set to True
     // though most operations don't actually change except division
 
-    let parseNeval tList (symbolTable: Map<string, double>) (typeTable: Map<string, bool>) xstart xstop xstep derivMode = 
+    // derivMode:
+    // 'n' : plot graph normally (or other character)
+    // 'd' : plot derivative
+    // 'i' : calculate definite integral between xstart and xstop
+
+    let parseNeval tList (symbolTable: Map<string, double>) (typeTable: Map<string, bool>) xstart xstop xstep (derivMode:char) = 
         let rec St tList (symbolTable: Map<string, double>) =
             match tList with
             | Var varName :: Ass :: tail -> match varName with
@@ -229,18 +234,35 @@ module FSInterpreter
                                                                 let x_expr = replaceX expr xstart                             // set value of x
                                                                 let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
 
-                                                                if derivMode then                                     // find derivative by
-                                                                    let dx = 0.000001
-                                                                    let x_expr = replaceX expr (xstart + dx)                  // evaluate RHS for x + dx
-                                                                    let tList, dx_result, dxIsInt = E x_expr
-                                                                    let dy = dx_result - result                               // find dy
-                                                                    [xstart, dy/dx] :: genGraph expr (xstart+xstep)           // repeat for next x
+                                                                match derivMode with
+                                                                | 'd' -> let dx = 0.000001                                    // find derivative by
+                                                                         let x_expr = replaceX expr (xstart + dx)             // evaluate RHS for x + dx
+                                                                         let tList, dx_result, dxIsInt = E x_expr
+                                                                         let dy = dx_result - result                          // find dy
+                                                                         [xstart, dy/dx] :: genGraph expr (xstart+xstep)      // repeat for next x
 
-                                                                else
-                                                                    [xstart, result] :: genGraph expr (xstart+xstep)          // repeat for next x
+                                                                // note that in integration mode xstep is dx
+                                                                | 'i' -> let x_expr = replaceX expr (xstart + xstep)          // evaluate RHS for x + dx
+                                                                         let tList, dx_result, dxIsInt = E x_expr
+                                                                         let area = ((result+dx_result) / 2.0) * xstep        // calculate area of trapezium
+                                                                         [xstart, area] :: genGraph expr (xstart+xstep)       // repeat for next x
+                                                                         
+
+                                                                | _ -> [xstart, result] :: genGraph expr (xstart+xstep)       // repeat for next x
+                                                                    
 
                                                      let graphPoints = genGraph tail xstart
-                                                     (graphPoints, symbolTable, typeTable)
+
+                                                     // sum areas if in integration mode
+                                                     match derivMode with
+                                                     | 'i' -> let rec sumAreas(points: ((double * float) list list), total:double) =
+                                                                  match points with
+                                                                  | head :: tail -> let x, area = head[0]
+                                                                                    sumAreas(tail, total + area)
+                                                                  | [] -> total
+                                                              ([[sumAreas(graphPoints, 0.0),0.0]], symbolTable, typeTable)
+                                                     | _   -> (graphPoints, symbolTable, typeTable)
+                                                     
 
                                             // standard assignment
                                             | _ -> let tList, result, resIsInt = E tail // evaluate RHS
@@ -371,7 +393,7 @@ module FSInterpreter
             ["pi", false]
             |> Map.ofList
 
-        let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01, false) // plotting arguments aren't used, just give default values
+        let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01, 'n') // plotting arguments aren't used, just give default values
         let group = result[0]
         let answer, answer2 = group[0]
         answer
@@ -396,8 +418,38 @@ module FSInterpreter
         let typeTable =
             ["pi", false]
             |> Map.ofList
+        
+        match derivMode with
+            | true  -> processLines(lines, symbolTable, typeTable, start,stop,step, 'd')
+            | false -> processLines(lines, symbolTable, typeTable, start,stop,step, 'n')
 
-        processLines(lines, symbolTable, typeTable, start,stop,step, derivMode)
+
+    // Calculate the definite integral for an input string
+    // Arguments:
+    // str: input code
+    // start: initial x value
+    // stop: ending x value
+    let integral(str: string, start: double, stop: double) =
+        if start >= stop then
+            mathError "Ending value should be greater than the starting value."
+
+        let lines = Array.toList(str.Split(';'))
+
+        let symbolTable = 
+            ["pi", double 3.141592653589793]
+            |> Map.ofList
+        let typeTable =
+            ["pi", false]
+            |> Map.ofList
+
+        let dx = 0.000001
+        
+        let result = processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
+        let group = result[0]
+        let answer, answer2 = group[0]
+        answer
+
+
         
 
     // no longer needed due to having a GUI
