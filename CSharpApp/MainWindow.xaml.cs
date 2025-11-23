@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Wpf;
+using OxyPlot.Axes;
 
 namespace CSharpApp
 {
@@ -89,9 +90,30 @@ namespace CSharpApp
 
                 line_series.Points.AddRange(points);
                 model.Series.Add(line_series);
+                
+                var xAxis = new LinearAxis
+                { 
+                    Position = AxisPosition.Bottom,
+                    MajorGridlineStyle = LineStyle.Solid, 
+                    MinorGridlineStyle = LineStyle.Dot,
+                    Title = "X-Axis"
+                
+                };
+
+                model.Axes.Add(xAxis);
+
+                var yAxis = new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    Title = "Y-Axis"
+                };
+
+                model.Axes.Add(yAxis);
 
                 Plot_Window gwin = new Plot_Window(model);
-                pwin.Show();
+                gwin.Show();
             }
             catch (Exception ex)
             {
