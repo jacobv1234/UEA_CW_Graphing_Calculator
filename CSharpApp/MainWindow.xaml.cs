@@ -65,10 +65,10 @@ namespace CSharpApp
             }
             try
             {
-                double start = double.Parse(pwin.Start.Text);
-                double stop = double.Parse(pwin.Stop.Text);
-                double step = double.Parse(pwin.Step.Text);
-                bool Show_Derivative = (bool)pwin.Show_Derivative.IsChecked;
+                double start = pwin.StartValue;
+                double stop = pwin.StopValue;
+                double step = pwin.StepValue;
+                bool Show_Derivative = pwin.DerivativeChecked;
 
 
 
@@ -90,7 +90,8 @@ namespace CSharpApp
                 line_series.Points.AddRange(points);
                 model.Series.Add(line_series);
 
-                PlotView.Model = model;
+                Plot_Window gwin = new Plot_Window(model);
+                pwin.Show();
             }
             catch (Exception ex)
             {
