@@ -15,6 +15,7 @@ using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Wpf;
 using OxyPlot.Axes;
+using System.Windows.Media.Animation;
 
 namespace CSharpApp
 {
@@ -86,10 +87,14 @@ namespace CSharpApp
                     StrokeThickness = 2,
                     MarkerType = MarkerType.Circle,
                     MarkerSize = 2,
+                    InterpolationAlgorithm = InterpolationAlgorithms.CatmullRomSpline
+                    
                 };
 
                 line_series.Points.AddRange(points);
+
                 model.Series.Add(line_series);
+                
                 
                 var xAxis = new LinearAxis
                 { 
