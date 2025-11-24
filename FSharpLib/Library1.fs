@@ -229,7 +229,7 @@ module FSInterpreter
 
                                             // graphing mode
                                             | "y" -> let rec genGraph expr (xstart: double) =
-                                                            if xstart > xstop then
+                                                            if xstart >= xstop then
                                                                 []
                                                             else
                                                                 let x_expr = replaceX expr xstart                             // set value of x
@@ -246,7 +246,7 @@ module FSInterpreter
                                                                 | 'i' -> let x_expr = replaceX expr (xstart + xstep)                       // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
                                                                          let area = abs((double)((result+dx_result) / 2.0) * xstep)        // calculate area of trapezium
-                                                                         mathError (sprintf "%f" area)
+                                                                         
                                                                          [xstart, area] :: genGraph expr (xstart+xstep)                    // repeat for next x
                                                                          
 

@@ -43,13 +43,22 @@ namespace CSharpApp
                 string line_equ = equation;
                 int num_trap = iwin.num_trap;
 
-                double result = FSInterpreter.integral(line_equ, start, stop, num_trap);
-                
-                Output_Plot.Text = result.ToString();
+                var points = FSInterpreter.integral(line_equ, start, stop, num_trap);
+
+                double total_y = 0;
+
+                var point = points.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
+
+                foreach (var pair in point)
+                {
+                    total_y += pair.Y;
+                }
+
+                Output_Plot.Text = total_y.ToString();
             }
             catch (Exception ex)
             {
-                Output_Plot.Text = ex.ToString();
+                Output_Plot.Text = ex.Message;
             }
         }
     }
