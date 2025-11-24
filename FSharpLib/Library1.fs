@@ -237,16 +237,17 @@ module FSInterpreter
 
                                                                 match derivMode with
                                                                 | 'd' -> let dx:double = 0.000001                                    // find derivative by
-                                                                         let x_expr = replaceX expr (xstart + dx)             // evaluate RHS for x + dx
+                                                                         let x_expr = replaceX expr (xstart + dx)                    // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
-                                                                         let dy = dx_result - result                          // find dy
-                                                                         [xstart, (double) dy/dx] :: genGraph expr (xstart+xstep)      // repeat for next x
+                                                                         let dy = dx_result - result                                 // find dy
+                                                                         [xstart, (double) dy/dx] :: genGraph expr (xstart+xstep)    // repeat for next x
 
                                                                 // note that in integration mode xstep is dx
-                                                                | 'i' -> let x_expr = replaceX expr (xstart + xstep)          // evaluate RHS for x + dx
+                                                                | 'i' -> let x_expr = replaceX expr (xstart + xstep)                       // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
                                                                          let area = abs((double)((result+dx_result) / 2.0) * xstep)        // calculate area of trapezium
-                                                                         [xstart, area] :: genGraph expr (xstart+xstep)       // repeat for next x
+                                                                         mathError (sprintf "%f" area)
+                                                                         [xstart, area] :: genGraph expr (xstart+xstep)                    // repeat for next x
                                                                          
 
                                                                 | _ -> [xstart, result] :: genGraph expr (xstart+xstep)       // repeat for next x
@@ -254,15 +255,8 @@ module FSInterpreter
 
                                                      let graphPoints = genGraph tail xstart
 
-                                                     // sum areas if in integration mode
-                                                     match derivMode with
-                                                     | 'i' -> let rec sumAreas(points: ((double * double) list list), total:double) =
-                                                                  match points with
-                                                                  | head :: tail -> let x, area = head[0]
-                                                                                    sumAreas(tail, total + area)
-                                                                  | [] -> total
-                                                              ([[sumAreas(graphPoints, 0.0),0.0]], symbolTable, typeTable)
-                                                     | _   -> (graphPoints, symbolTable, typeTable)
+                                                     
+                                                     (graphPoints, symbolTable, typeTable)
                                                      
 
                                             // standard assignment
@@ -447,12 +441,9 @@ module FSInterpreter
 
         let dx = (stop - start) / ((double) trapezia)
         
+        
         try
-            let result = processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
-            // extract answer
-            let group = result[0]
-            let answer, answer2 = group[0]
-            answer
+            processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
         with
         | :? System.StackOverflowException ->
             stackError()
