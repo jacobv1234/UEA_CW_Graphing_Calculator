@@ -7,11 +7,13 @@
         mc:Ignorable="d"
         Title="Integral_Popup" Height="450" Width="400">
     <Grid>
-        <TextBox x:Name="Start_Value" Margin="200,29,80,0" TextWrapping="Wrap" Text="Input Start" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Stop_Value" HorizontalAlignment="Left" Margin="200,81,0,0" TextWrapping="Wrap" Text="Input Stop" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Start_Value" Margin="200,29,80,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Stop_Value" HorizontalAlignment="Left" Margin="200,81,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="86,30,0,0" TextWrapping="Wrap" Text="Start Value:" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="86,82,0,0" TextWrapping="Wrap" Text="Stop Value:" VerticalAlignment="Top"/>
-        <Button Content="Calculate Integral" HorizontalAlignment="Center" Margin="0,141,0,0" VerticalAlignment="Top" Click="IntegralCalculate"/>
+        <Button Content="Calculate Integral" HorizontalAlignment="Center" Margin="0,182,0,0" VerticalAlignment="Top" Click="IntegralCalculate"/>
+        <TextBox x:Name="Trap_Num" HorizontalAlignment="Left" Margin="200,131,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="64,132,0,0" TextWrapping="Wrap" Text="Num of Trapeziums" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

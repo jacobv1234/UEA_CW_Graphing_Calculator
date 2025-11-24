@@ -41,8 +41,9 @@ namespace CSharpApp
                 double start = iwin.start_value;
                 double stop = iwin.stop_value;
                 string line_equ = equation;
+                int num_trap = iwin.num_trap;
 
-                double result = FSInterpreter.integral(line_equ, start, stop);
+                double result = FSInterpreter.integral(line_equ, start, stop, num_trap);
                 
                 Output_Plot.Text = result.ToString();
             }

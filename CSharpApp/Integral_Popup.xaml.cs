@@ -24,6 +24,8 @@ namespace CSharpApp
 
         public double stop_value { get; private set; }
 
+        public int num_trap {  get; private set; }
+
         public Integral_Popup()
         {
             InitializeComponent();
@@ -33,6 +35,7 @@ namespace CSharpApp
         {
             start_value = double.Parse(Start_Value.Text);
             stop_value = double.Parse(Stop_Value.Text);
+            num_trap = int.Parse(Trap_Num.Text);
 
             this.Close();
         }
