@@ -21,11 +21,35 @@ namespace CSharpApp
     /// </summary>
     public partial class Plot_Window : Window
     {
-        public Plot_Window(PlotModel m)
+        string equation;
+        public Plot_Window(PlotModel m, string line_equ)
         {
             InitializeComponent();
 
             PlotView.Model = m;
+
+            this.equation = line_equ;
+        }
+
+        public void IntegralClick(object sender, RoutedEventArgs e)
+        {
+            Integral_Popup iwin = new Integral_Popup();
+            iwin.ShowDialog();
+
+            try
+            {
+                double start = iwin.start_value;
+                double stop = iwin.stop_value;
+                string line_equ = equation;
+
+                double result = FSInterpreter.integral(line_equ, start, stop);
+                
+                Output_Plot.Text = result.ToString();
+            }
+            catch (Exception ex)
+            {
+                Output_Plot.Text = ex.ToString();
+            }
         }
     }
 }

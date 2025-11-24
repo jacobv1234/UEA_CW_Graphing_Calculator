@@ -6,9 +6,12 @@
         xmlns:local="clr-namespace:CSharpApp"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="Plot_Window" Height="450" Width="800">
+        Title="Plot_Window" Height="500" Width="800">
     <Grid>
-        <oxy:PlotView x:Name="PlotView" />
+        <oxy:PlotView x:Name="PlotView" Height="375" Margin="0,0,0,84"/>
+        <Button x:Name="Integral" Content="Calculate Integral" HorizontalAlignment="Left" Margin="36,393,0,0" VerticalAlignment="Top" Click="IntegralClick"/>
+        <Button x:Name="Root" Content="Find Root" HorizontalAlignment="Left" Margin="154,393,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="Output_Plot" HorizontalAlignment="Right" Height="23" Margin="0,395,10,0" TextWrapping="Wrap" Text="Output" VerticalAlignment="Top" Width="272" RenderTransformOrigin="0.508,0.53"/>
 
     </Grid>
 </Window>

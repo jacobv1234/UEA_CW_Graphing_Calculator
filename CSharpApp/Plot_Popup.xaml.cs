@@ -38,7 +38,7 @@ namespace CSharpApp
             StepValue = double.Parse(Step.Text);
             DerivativeChecked = (bool)Show_Derivative.IsChecked;
             
-            this.DialogResult = true;
+            
             this.Close();
         }
 

@@ -117,7 +117,7 @@ namespace CSharpApp
 
                 model.Axes.Add(yAxis);
 
-                Plot_Window gwin = new Plot_Window(model);
+                Plot_Window gwin = new Plot_Window(model, line_equ);
                 gwin.Show();
             }
             catch (Exception ex)
