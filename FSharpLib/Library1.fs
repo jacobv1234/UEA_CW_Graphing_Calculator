@@ -235,16 +235,16 @@ module FSInterpreter
                                                                 let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
 
                                                                 match derivMode with
-                                                                | 'd' -> let dx = 0.000001                                    // find derivative by
+                                                                | 'd' -> let dx:double = 0.000001                                    // find derivative by
                                                                          let x_expr = replaceX expr (xstart + dx)             // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
                                                                          let dy = dx_result - result                          // find dy
-                                                                         [xstart, dy/dx] :: genGraph expr (xstart+xstep)      // repeat for next x
+                                                                         [xstart, (double) dy/dx] :: genGraph expr (xstart+xstep)      // repeat for next x
 
                                                                 // note that in integration mode xstep is dx
                                                                 | 'i' -> let x_expr = replaceX expr (xstart + xstep)          // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
-                                                                         let area = ((result+dx_result) / 2.0) * xstep        // calculate area of trapezium
+                                                                         let area = (double)((result+dx_result) / 2.0) * xstep        // calculate area of trapezium
                                                                          [xstart, area] :: genGraph expr (xstart+xstep)       // repeat for next x
                                                                          
 
@@ -255,7 +255,7 @@ module FSInterpreter
 
                                                      // sum areas if in integration mode
                                                      match derivMode with
-                                                     | 'i' -> let rec sumAreas(points: ((double * float) list list), total:double) =
+                                                     | 'i' -> let rec sumAreas(points: ((double * double) list list), total:double) =
                                                                   match points with
                                                                   | head :: tail -> let x, area = head[0]
                                                                                     sumAreas(tail, total + area)
@@ -394,6 +394,7 @@ module FSInterpreter
             |> Map.ofList
 
         let result = processLines(lines, symbolTable, typeTable, 0.0,10.0,0.01, 'n') // plotting arguments aren't used, just give default values
+        // extract answer
         let group = result[0]
         let answer, answer2 = group[0]
         answer
@@ -445,6 +446,7 @@ module FSInterpreter
         let dx = 0.000001
         
         let result = processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
+        // extract answer
         let group = result[0]
         let answer, answer2 = group[0]
         answer
