@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Wpf;
+using OxyPlot.Axes;
+using System.Windows.Media.Animation;
 
 namespace CSharpApp
 {
@@ -65,10 +67,10 @@ namespace CSharpApp
             }
             try
             {
-                double start = double.Parse(pwin.Start.Text);
-                double stop = double.Parse(pwin.Stop.Text);
-                double step = double.Parse(pwin.Step.Text);
-                bool Show_Derivative = (bool)pwin.Show_Derivative.IsChecked;
+                double start = pwin.StartValue;
+                double stop = pwin.StopValue;
+                double step = pwin.StepValue;
+                bool Show_Derivative = pwin.DerivativeChecked;
 
 
 
@@ -85,12 +87,38 @@ namespace CSharpApp
                     StrokeThickness = 2,
                     MarkerType = MarkerType.Circle,
                     MarkerSize = 2,
+                    InterpolationAlgorithm = InterpolationAlgorithms.CatmullRomSpline
+                    
                 };
 
                 line_series.Points.AddRange(points);
-                model.Series.Add(line_series);
 
-                PlotView.Model = model;
+                model.Series.Add(line_series);
+                
+                
+                var xAxis = new LinearAxis
+                { 
+                    Position = AxisPosition.Bottom,
+                    MajorGridlineStyle = LineStyle.Solid, 
+                    MinorGridlineStyle = LineStyle.Dot,
+                    Title = "X-Axis"
+                
+                };
+
+                model.Axes.Add(xAxis);
+
+                var yAxis = new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    Title = "Y-Axis"
+                };
+
+                model.Axes.Add(yAxis);
+
+                Plot_Window gwin = new Plot_Window(model);
+                gwin.Show();
             }
             catch (Exception ex)
             {

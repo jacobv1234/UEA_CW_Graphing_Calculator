@@ -19,15 +19,27 @@ namespace CSharpApp
     /// </summary>
     public partial class Plot_Popup : Window
     {
+        public double StartValue { get; private set; }
+        public double StopValue { get; private set; }
+
+        public double StepValue { get; private set; }
+
+        public bool DerivativeChecked { get; private set; }
+        
         public Plot_Popup()
         {
             InitializeComponent();
-            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            StartValue = double.Parse(Start.Text);
+            StopValue = double.Parse(Stop.Text);
+            StepValue = double.Parse(Step.Text);
+            DerivativeChecked = (bool)Show_Derivative.IsChecked;
+            
+            this.DialogResult = true;
+            this.Close();
         }
 
         
