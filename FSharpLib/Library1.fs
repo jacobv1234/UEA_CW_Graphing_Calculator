@@ -21,6 +21,7 @@ module FSInterpreter
     let parseError message = raise (System.Exception(sprintf "Parser error: %s" message))
     let mathError message = raise (System.Exception(sprintf "Maths error: %s" message))
     let nameError message = raise (System.Exception(sprintf "Name error: %s" message))
+    let stackError() = raise (System.Exception("Error: Stack overflow"))
 
 
     // get how many of the first characters in a string are 0s
@@ -244,7 +245,7 @@ module FSInterpreter
                                                                 // note that in integration mode xstep is dx
                                                                 | 'i' -> let x_expr = replaceX expr (xstart + xstep)          // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
-                                                                         let area = (double)((result+dx_result) / 2.0) * xstep        // calculate area of trapezium
+                                                                         let area = abs((double)((result+dx_result) / 2.0) * xstep)        // calculate area of trapezium
                                                                          [xstart, area] :: genGraph expr (xstart+xstep)       // repeat for next x
                                                                          
 
@@ -430,7 +431,8 @@ module FSInterpreter
     // str: input code
     // start: initial x value
     // stop: ending x value
-    let integral(str: string, start: double, stop: double) =
+    // trapezia: number of trapezia in approximation
+    let integral(str: string, start: double, stop: double, trapezia: int) =
         if start >= stop then
             mathError "Ending value should be greater than the starting value."
 
@@ -443,13 +445,17 @@ module FSInterpreter
             ["pi", false]
             |> Map.ofList
 
-        let dx = 0.000001
+        let dx = (stop - start) / ((double) trapezia)
         
-        let result = processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
-        // extract answer
-        let group = result[0]
-        let answer, answer2 = group[0]
-        answer
+        try
+            let result = processLines(lines, symbolTable, typeTable, start,stop,dx, 'i')
+            // extract answer
+            let group = result[0]
+            let answer, answer2 = group[0]
+            answer
+        with
+        | :? System.StackOverflowException ->
+            stackError()
 
 
         
