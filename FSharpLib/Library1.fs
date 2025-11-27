@@ -236,7 +236,7 @@ module FSInterpreter
                                                                 let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
 
                                                                 match derivMode with
-                                                                | 'd' -> let dx:double = 0.000001                                    // find derivative by
+                                                                | 'd' -> let dx:double = 0.000000001                                 // find derivative by
                                                                          let x_expr = replaceX expr (xstart + dx)                    // evaluate RHS for x + dx
                                                                          let tList, dx_result, dxIsInt = E x_expr
                                                                          let dy = dx_result - result                                 // find dy
@@ -447,6 +447,53 @@ module FSInterpreter
         with
         | :? System.StackOverflowException ->
             stackError()
+
+    
+    // find a root for a graph using Newton-Raphson method
+    let findRoot(str: string, seed: double) =
+        // setup
+        let lines = Array.toList(str.Split(';'))
+
+        let initialSymbolTable = 
+            ["pi", double 3.141592653589793]
+            |> Map.ofList
+
+        let initialTypeTable =
+            ["pi", false]
+            |> Map.ofList
+
+        let accuracy = 0.000001
+
+
+        let rec NRstep x change =
+            // stop if last difference was less than accuracy
+            if change < accuracy then
+                x
+            else
+                // find the value of f(x)
+                // setting parameters up this way means f(x) is only calculated for x
+                let result = processLines(lines, initialSymbolTable, initialTypeTable, x,x+1.0,2.0, 'n')
+                let xy_pair = result[0]
+                let temp, fx = xy_pair[0]
+
+                // find the value of f'(x)
+                let result = processLines(lines, initialSymbolTable, initialTypeTable, x,x+1.0,2.0, 'd')
+                let xy_pair = result[0]
+                let temp, dfx = xy_pair[0]
+
+                // calculate next x value
+                let newX = x - (fx / dfx)
+                let diff = abs(x - newX)
+
+                // recurse
+                NRstep newX diff
+
+        // begin processing
+        NRstep seed 1.0
+
+
+
+
 
 
         
