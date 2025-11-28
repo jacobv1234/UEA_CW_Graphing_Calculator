@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpApp"
         mc:Ignorable="d"
-        Title="Plot_Popup" Height="342" Width="400">
+        Title="Plot_Popup" Height="450" Width="400">
     <Grid>
         <TextBox Name="Start" HorizontalAlignment="Left" Margin="181,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
         <TextBox Name="Stop" HorizontalAlignment="Left" Margin="181,123,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
