@@ -14,5 +14,8 @@
     <Compile Update="Plot_Window.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Root_Popup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

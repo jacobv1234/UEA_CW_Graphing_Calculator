@@ -450,7 +450,7 @@ module FSInterpreter
 
     
     // find a root for a graph using Newton-Raphson method
-    let findRoot(str: string, seed: double) =
+    let get_Root(str: string, seed: double) =
         // setup
         let lines = Array.toList(str.Split(';'))
 

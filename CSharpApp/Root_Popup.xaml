@@ -1,0 +1,15 @@
+﻿<Window x:Class="CSharpApp.Root_Popup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CSharpApp"
+        mc:Ignorable="d"
+        Title="Root_Popup" Height="450" Width="400">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="87,81,0,0" TextWrapping="Wrap" Text="Root Seed" VerticalAlignment="Top"/>
+        <TextBox x:Name ="seed" HorizontalAlignment="Left" Margin="209,80,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Find Root" HorizontalAlignment="Center" Margin="0,147,0,0" VerticalAlignment="Top" Click="Root_Seed"/>
+
+    </Grid>
+</Window>

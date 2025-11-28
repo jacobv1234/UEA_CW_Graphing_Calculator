@@ -61,5 +61,28 @@ namespace CSharpApp
                 Output_Plot.Text = ex.Message;
             }
         }
+
+        public void Find_Root(object sender, RoutedEventArgs e)
+        {
+            Root_Popup rwin = new Root_Popup();
+            rwin.ShowDialog();
+
+            try
+            {
+                double seed = rwin.Seed;
+                string line_equ = equation;
+
+                var final_seed = FSInterpreter.get_Root(equation, seed);
+
+                Output_Plot.Text = final_seed.ToString();
+            }
+            catch (Exception ex)
+            {
+                Output_Plot.Text = ex.Message;
+            }
+
+
+        }
+
     }
 }
