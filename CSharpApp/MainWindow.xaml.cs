@@ -16,6 +16,7 @@ using OxyPlot.Series;
 using OxyPlot.Wpf;
 using OxyPlot.Axes;
 using System.Windows.Media.Animation;
+using OxyPlot.Legends;
 
 namespace CSharpApp
 {
@@ -74,11 +75,15 @@ namespace CSharpApp
 
 
 
-                var plot_results = FSInterpreter.plot(line_equ, start, stop, step, Show_Derivative);
+                var plot_results = FSInterpreter.plot(line_equ, start, stop, step, false);
+
+                var deriv_plot_results = FSInterpreter.plot(line_equ, start, stop, step, true);
                 
                 
 
                 var points = plot_results.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
+
+                var deriv_points = deriv_plot_results.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
 
                 var model = new PlotModel { Title = line_equ };
                 var line_series = new LineSeries
@@ -87,15 +92,32 @@ namespace CSharpApp
                     StrokeThickness = 2,
                     MarkerType = MarkerType.Circle,
                     MarkerSize = 2,
-                    InterpolationAlgorithm = InterpolationAlgorithms.CatmullRomSpline
-                    
+                    InterpolationAlgorithm = InterpolationAlgorithms.CatmullRomSpline,
+                    Color = OxyColors.Blue
+
+                };
+
+                var deriv_line_series = new LineSeries
+                {
+                    Title = "Derivative of " + line_equ,
+                    StrokeThickness = 2,
+                    MarkerType = MarkerType.Circle,
+                    MarkerSize = 2,
+                    InterpolationAlgorithm = InterpolationAlgorithms.CatmullRomSpline,
+                    Color = OxyColors.Red
+
                 };
 
                 line_series.Points.AddRange(points);
+                
+                deriv_line_series.Points.AddRange(deriv_points);
+
+                
 
                 model.Series.Add(line_series);
-                
-                
+                model.Series.Add(deriv_line_series);
+
+
                 var xAxis = new LinearAxis
                 { 
                     Position = AxisPosition.Bottom,
@@ -116,6 +138,16 @@ namespace CSharpApp
                 };
 
                 model.Axes.Add(yAxis);
+
+                var legend = new Legend
+                {
+                    LegendPosition = LegendPosition.TopRight,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendOrientation = LegendOrientation.Vertical,
+                    LegendBorderThickness = 1
+                };
+
+                model.Legends.Add(legend);
 
                 Plot_Window gwin = new Plot_Window(model, line_equ);
                 gwin.Show();
