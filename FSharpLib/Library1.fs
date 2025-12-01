@@ -233,24 +233,28 @@ module FSInterpreter
                                                                 []
                                                             else
                                                                 let x_expr = replaceX expr xstart                             // set value of x
-                                                                let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
+                                                                try
+                                                                    let tList, result, resIsInt = E x_expr                        // evaluate RHS for value of x
 
-                                                                match derivMode with
-                                                                | 'd' -> let dx:double = 0.000000001                                 // find derivative by
-                                                                         let x_expr = replaceX expr (xstart + dx)                    // evaluate RHS for x + dx
-                                                                         let tList, dx_result, dxIsInt = E x_expr
-                                                                         let dy = dx_result - result                                 // find dy
-                                                                         [xstart, (double) dy/dx] :: genGraph expr (xstart+xstep)    // repeat for next x
+                                                                    match derivMode with
+                                                                    | 'd' -> let dx:double = 0.000000001                                 // find derivative by
+                                                                             let x_expr = replaceX expr (xstart + dx)                    // evaluate RHS for x + dx
+                                                                             let tList, dx_result, dxIsInt = E x_expr
+                                                                             let dy = dx_result - result                                 // find dy
+                                                                             [xstart, (double) dy/dx] :: genGraph expr (xstart+xstep)    // repeat for next x
 
-                                                                // note that in integration mode xstep is dx
-                                                                | 'i' -> let x_expr = replaceX expr (xstart + xstep)                       // evaluate RHS for x + dx
-                                                                         let tList, dx_result, dxIsInt = E x_expr
-                                                                         let area = abs((double)((result+dx_result) / 2.0) * xstep)        // calculate area of trapezium
+                                                                    // note that in integration mode xstep is dx
+                                                                    | 'i' -> let x_expr = replaceX expr (xstart + xstep)                       // evaluate RHS for x + dx
+                                                                             let tList, dx_result, dxIsInt = E x_expr
+                                                                             let area = abs((double)((result+dx_result) / 2.0) * xstep)        // calculate area of trapezium
                                                                          
-                                                                         [xstart, area] :: genGraph expr (xstart+xstep)                    // repeat for next x
+                                                                             [xstart, area] :: genGraph expr (xstart+xstep)                    // repeat for next x
                                                                          
 
-                                                                | _ -> [xstart, result] :: genGraph expr (xstart+xstep)       // repeat for next x
+                                                                    | _ -> [xstart, result] :: genGraph expr (xstart+xstep)       // repeat for next x
+
+                                                                with
+                                                                | :? Exception -> [xstart, 0.0] :: genGraph expr (xstart+xstep) // catch division by 0
                                                                     
 
                                                      let graphPoints = genGraph tail xstart
