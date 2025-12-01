@@ -1,0 +1,29 @@
+- fixed variable subtraction
+- variables can be ints or doubles
+- plot derivatives
+- log() and ln()
+- pi
+
+- definite integrals in graph view	
+- graph in separate window		
+- gridlines				
+- spline interpolation			
+
+- handling division by 0 in graph view
+- root finding				
+- update help menu
+
+
+PLAN
+
+- clear axes				D
+- plot derivative and original		D
+- visual integral			D
+- tangent plotting			J
+- infinite graph?			D + J
+
+
+
+y=2*x 		0 to 1 			= 1
+y=2*x + 3	-1 to 1			= 6
+y=x^2-3*x	4 to 10			= 186

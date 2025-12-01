@@ -138,7 +138,7 @@ module FSInterpreter
     // <S>        ::= <NR> <Sopt>
     // <Sopt>     ::= "E" <NR> | <empty>
     // <NR>       ::= "Num" <value> | "(" <E> ")" | "- (unary)" <NR> | <value> '.' <value> | 
-    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | "log(" <E> ")" | <var> | 'x'
+    //                  "sin(" <E> ")" | "cos(" <E> ")" | "tan(" <E> ")" | "log(" <E> ")" | "ln(" <E> ")" | <var> | 'x'
 
     let parser tList (symbolTable: Map<string, double>) = 
         let rec St tList =                // >> is forward function composition operator: let inline (>>) f g x = g(f x)
@@ -496,8 +496,30 @@ module FSInterpreter
         NRstep seed 1.0
 
 
+    // plot tangent line of graph
+    let tangent(str: string, x: double) =
+        let dx = 0.000000001
 
+        // setup
+        let lines = Array.toList(str.Split(';'))
 
+        let symbolTable = 
+            ["pi", double 3.141592653589793]
+            |> Map.ofList
+
+        let typeTable =
+            ["pi", false]
+            |> Map.ofList
+
+        // get coord pair (x-dx, f(x-dx))
+        let result = processLines(lines, symbolTable, typeTable, x-dx,x+1.0,2.0, 'n')
+        let xy_pair = result[0]
+
+        // get coord pair (x+dx, f(x+dx))
+        let result = processLines(lines, symbolTable, typeTable, x+dx,x+1.0,2.0, 'n')
+        let dxy_pair = result[0]
+
+        [xy_pair, dxy_pair]
 
 
         
