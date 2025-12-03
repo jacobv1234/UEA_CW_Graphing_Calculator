@@ -17,6 +17,7 @@ using OxyPlot.Wpf;
 using OxyPlot.Axes;
 using System.Windows.Media.Animation;
 using OxyPlot.Legends;
+using OxyPlot.Annotations;
 
 namespace CSharpApp
 {
@@ -26,9 +27,14 @@ namespace CSharpApp
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        string history;
+
         public MainWindow()
         {
             InitializeComponent();
+
+          
         }
 
         private void Help_Button_Click(object sender, RoutedEventArgs e)
@@ -50,7 +56,10 @@ namespace CSharpApp
             { 
                 Error_txt.Text = ex.Message;
             }
-            
+
+            history = input_txt + " = " + Output_txt.Text + "\n \n" + history;
+
+            History_txt.Text = history;
         }
         
         private void Graph_Button_Click(object sender, RoutedEventArgs e)
@@ -110,26 +119,27 @@ namespace CSharpApp
 
                 line_series.Points.AddRange(points);
                 
-                deriv_line_series.Points.AddRange(deriv_points);
-
-                
-
-                model.Series.Add(line_series);
-                model.Series.Add(deriv_line_series);
+                if (Show_Derivative == true)
+                {
+                    deriv_line_series.Points.AddRange(deriv_points);
+                    model.Series.Add(line_series);
+                    model.Series.Add(deriv_line_series);
                 } else
                 {
                     model.Series.Add(line_series);
                 }
 
-
+                
 
                 var xAxis = new LinearAxis
-                { 
+                {
                     Position = AxisPosition.Bottom,
-                    MajorGridlineStyle = LineStyle.Solid, 
+                    MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
+                    
+                    MajorGridlineColor = OxyColors.Black,
                     Title = "X-Axis"
-                
+
                 };
 
                 model.Axes.Add(xAxis);
@@ -139,10 +149,13 @@ namespace CSharpApp
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
+                    MajorGridlineColor = OxyColors.Black,
                     Title = "Y-Axis"
                 };
 
                 model.Axes.Add(yAxis);
+
+                
 
                 var legend = new Legend
                 {

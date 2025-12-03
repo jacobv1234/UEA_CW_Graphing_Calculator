@@ -12,16 +12,16 @@
 - handling division by 0 in graph view
 - root finding				
 - update help menu
-- plot derivative and original		
+- plot derivative and original	
+- clear axes				
 
 
 PLAN
 
-- clear axes				D
-
 - visual integral			D
-- tangent plotting			J
+- tangent plotting			D
 - infinite graph?			D + J
+- history					D
 
 
 

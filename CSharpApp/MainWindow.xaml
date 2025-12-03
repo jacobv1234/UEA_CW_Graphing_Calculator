@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CSharpApp"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="800">
     <Grid>
         <TextBox x:Name="Input_Text" HorizontalAlignment="Left" Margin="21,30,0,0" TextWrapping="Wrap" Text="Input Your Equation Here" VerticalAlignment="Top" Width="355" Height="161" MaxLength="64"/>
         <Button Content="Help Menu" HorizontalAlignment="Left" Margin="186,217,0,0" VerticalAlignment="Top" Click="Help_Button_Click"/>
@@ -14,6 +14,7 @@
         <TextBox x:Name="Output_txt" HorizontalAlignment="Left" Margin="461,30,0,0" TextWrapping="Wrap" Text="Equation Output Here" VerticalAlignment="Top" Width="303" Height="40" Style ="{StaticResource ReadOnlyBox}" IsReadOnly="True"/>
         <TextBox x:Name="Error_txt" HorizontalAlignment="Left" Margin="461,110,0,0" TextWrapping="Wrap" Text="Error Output Here" VerticalAlignment="Top" Width="303" Height="50" Style ="{StaticResource ReadOnlyBox}" IsReadOnly="True"/>
         <Button x:Name="Plot_BTN" Content="Plot" HorizontalAlignment="Left" Margin="118,217,0,0" VerticalAlignment="Top" Click="Graph_Button_Click" Width="46"/>
-        
+        <TextBox x:Name="History_txt" HorizontalAlignment="Left" Margin="461,215,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="303" Height="198" IsReadOnly="True" Background="#FFEDEDED" BorderBrush="#FFCECECE" TextAlignment="Left" VerticalContentAlignment="Top"/>
+
     </Grid>
 </Window>

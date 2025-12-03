@@ -54,6 +54,8 @@ namespace CSharpApp
                     total_y += pair.Y;
                 }
 
+                
+
                 Output_Plot.Text = total_y.ToString();
             }
             catch (Exception ex)
