@@ -116,6 +116,11 @@ namespace CSharpApp
 
                 model.Series.Add(line_series);
                 model.Series.Add(deriv_line_series);
+                } else
+                {
+                    model.Series.Add(line_series);
+                }
+
 
 
                 var xAxis = new LinearAxis
