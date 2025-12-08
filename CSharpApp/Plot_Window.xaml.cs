@@ -1,6 +1,9 @@
-﻿using OxyPlot;
+﻿using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Reflection;
+using OxyPlot;
 using OxyPlot.Series;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace CSharpApp
 {
@@ -22,6 +26,8 @@ namespace CSharpApp
     public partial class Plot_Window : Window
     {
         string equation;
+        private PlotModel model;
+
         public Plot_Window(PlotModel m, string line_equ)
         {
             InitializeComponent();
@@ -29,6 +35,7 @@ namespace CSharpApp
             PlotView.Model = m;
 
             this.equation = line_equ;
+            this.model = PlotView.Model;
         }
 
         public void IntegralClick(object sender, RoutedEventArgs e)
@@ -86,5 +93,57 @@ namespace CSharpApp
 
         }
 
+        private void Tangent_Click(object sender, RoutedEventArgs e)
+        {
+            Tangent_Popup twin = new Tangent_Popup();
+            twin.ShowDialog();
+
+            try
+            {
+                double xVal = twin.XVal;
+                string line_equ = equation;
+
+                var results = FSInterpreter.tangent(line_equ, xVal);
+
+                object[] fields = FSharpValue.GetTupleFields(results);
+
+                var list1 = (FSharpList<Tuple<double, double>>)fields[0];
+                var list2 = (FSharpList<Tuple<double, double>>)fields[1];
+
+                var p1 = list1.First();
+                var p2 = list2.First();
+                
+                // Coordinates of the 2 points
+                double x1 = p1.Item1, y1 = p1.Item2;
+                double x2 = p2.Item1, y2 = p2.Item2;
+                
+                double slope = (y2-y1) / (x2-x1);
+                double yIntercept = y1 - slope * x1;
+
+                double Xmin = model.Axes.First(a => a.Position == OxyPlot.Axes.AxisPosition.Bottom).ActualMinimum;
+                double Xmax = model.Axes.First(a => a.Position == OxyPlot.Axes.AxisPosition.Bottom).ActualMaximum;
+                double Ymin = slope * Xmin + yIntercept;
+                double Ymax = slope * Xmax + yIntercept;
+
+                var tanSeries = new LineSeries
+                {
+                    Title = $"Tangent at x = {xVal}",
+                    Color = OxyColors.Brown,
+                    StrokeThickness = 2
+                };
+
+                tanSeries.Points.Add(new DataPoint(Xmin, Ymin));
+                tanSeries.Points.Add(new DataPoint(Xmax, Ymax));
+
+                model.Series.Add(tanSeries);
+                model.InvalidatePlot(true);
+
+            }
+            catch (Exception ex) 
+            { 
+                Output_Plot.Text = ex.Message;
+            }
+
+        }
     }
 }

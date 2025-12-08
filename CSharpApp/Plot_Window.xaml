@@ -12,6 +12,7 @@
         <Button x:Name="Integral" Content="Calculate Integral" HorizontalAlignment="Left" Margin="36,400,0,0" VerticalAlignment="Top" Click="IntegralClick"/>
         <Button x:Name="Root" Content="Find Root" HorizontalAlignment="Left" Margin="203,400,0,0" VerticalAlignment="Top" Click="Find_Root"/>
         <TextBox x:Name="Output_Plot" HorizontalAlignment="Right" Height="44" Margin="0,393,10,0" TextWrapping="Wrap" Text="Output" VerticalAlignment="Top" Width="272" Style ="{StaticResource ReadOnlyBox}"/>
+        <Button x:Name="Tangent" Content="Plot Tangent" HorizontalAlignment="Left" Margin="331,400,0,0" VerticalAlignment="Top" Click="Tangent_Click"/>
 
     </Grid>
 </Window>
