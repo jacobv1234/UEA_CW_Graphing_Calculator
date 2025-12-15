@@ -60,9 +60,29 @@ namespace CSharpApp
                 {
                     total_y += pair.Y;
                 }
+                //This bit works but the shaded area is buggy. quatratics are where is looks the worst. Doesnt hit the line. 
+                //probably issue with using points but cannot see what. Meant to use the line equation in place of var y but didnt work cos its a string
+                var areaSeries = new AreaSeries
+                {
+                    Color = OxyColors.Transparent,
+                    Fill = OxyColor.FromAColor(100, OxyColors.SkyBlue),
+                    StrokeThickness = 0
+                };
 
-                
+                foreach (var innerlist in points)
+                {
+                    var pair = innerlist.First();
 
+                    double x = pair.Item1;
+                    double y = pair.Item2;
+
+                    areaSeries.Points.Add(new DataPoint(x, y));
+                    areaSeries.Points2.Add(new DataPoint(x, 0));
+                }
+
+                model.Series.Add(areaSeries);
+                model.InvalidatePlot(true);
+                // area between comments are all the visual integral stuff so can be deleted
                 Output_Plot.Text = total_y.ToString();
             }
             catch (Exception ex)
