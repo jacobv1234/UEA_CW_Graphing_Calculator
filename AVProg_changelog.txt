@@ -13,15 +13,17 @@
 - root finding				
 - update help menu
 - plot derivative and original	
-- clear axes				
+- clear axes	
+- tangent plotting			D
+- history					D
 
 
 PLAN
 
 - visual integral			D
-- tangent plotting			D
+
 - infinite graph?			D + J
-- history					D
+
 
 
 

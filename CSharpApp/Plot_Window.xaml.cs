@@ -105,10 +105,9 @@ namespace CSharpApp
 
                 var results = FSInterpreter.tangent(line_equ, xVal);
 
-                object[] fields = FSharpValue.GetTupleFields(results);
 
-                var list1 = (FSharpList<Tuple<double, double>>)fields[0];
-                var list2 = (FSharpList<Tuple<double, double>>)fields[1];
+                var list1 = results.Select(innerlist => innerlist.Item1).First();
+                var list2 = results.Select(innerlist => innerlist.Item2).First();
 
                 var p1 = list1.First();
                 var p2 = list2.First();
