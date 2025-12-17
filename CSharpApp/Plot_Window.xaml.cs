@@ -50,8 +50,15 @@ namespace CSharpApp
                 string line_equ = equation;
                 int num_trap = iwin.num_trap;
 
+                // generate a set of areas to add together
                 var points = FSInterpreter.integral(line_equ, start, stop, num_trap);
 
+                double trap_width = (stop - start) / num_trap;
+
+                // generate the relevant xy points on the original line to visualise
+                var trap_bounds = FSInterpreter.plot(line_equ, start, stop+0.00000001, trap_width, false);
+
+                // total areas to calculate definite integral
                 double total_y = 0;
 
                 var point = points.Select(innerlist => innerlist.First()).Select(pair => new DataPoint(pair.Item1, pair.Item2));
@@ -60,6 +67,7 @@ namespace CSharpApp
                 {
                     total_y += pair.Y;
                 }
+
                 //This bit works but the shaded area is buggy. quatratics are where is looks the worst. Doesnt hit the line. 
                 //probably issue with using points but cannot see what. Meant to use the line equation in place of var y but didnt work cos its a string
                 var areaSeries = new AreaSeries
@@ -69,7 +77,7 @@ namespace CSharpApp
                     StrokeThickness = 0
                 };
 
-                foreach (var innerlist in points)
+                foreach (var innerlist in trap_bounds)
                 {
                     var pair = innerlist.First();
 
