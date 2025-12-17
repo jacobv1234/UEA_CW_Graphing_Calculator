@@ -68,8 +68,7 @@ namespace CSharpApp
                     total_y += pair.Y;
                 }
 
-                //This bit works but the shaded area is buggy. quatratics are where is looks the worst. Doesnt hit the line. 
-                //probably issue with using points but cannot see what. Meant to use the line equation in place of var y but didnt work cos its a string
+                // use trap_bounds to create shaded region
                 var areaSeries = new AreaSeries
                 {
                     Color = OxyColors.Transparent,
