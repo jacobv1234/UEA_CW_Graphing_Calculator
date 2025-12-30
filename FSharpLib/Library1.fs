@@ -89,7 +89,7 @@ module FSInterpreter
             | '%'::tail -> Mod :: scan tail false
             | '^'::tail -> Exp :: scan tail false
             | '('::tail -> Lpar:: scan tail false
-            | ')'::tail -> Rpar:: scan tail false
+            | ')'::tail -> Rpar:: scan tail true
             | '='::tail -> Ass:: scan tail  false
             | '.'::tail -> Dot :: scan tail true 
             | 'E'::tail -> SF  :: scan tail false // treated as not a number to prevent decimal stuff below
